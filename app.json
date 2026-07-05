@@ -34,8 +34,17 @@
         }
       ],
       "expo-secure-store",
+      "@clerk/expo",
       "@sentry/react-native",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "tripme",
+          "organization": "jshkm-7a"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
