@@ -21,7 +21,8 @@
       "package": "com.fhakim.TRIPME"
     },
     "web": {
-      "output": "static",
+      "bundler": "metro",
+      "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
