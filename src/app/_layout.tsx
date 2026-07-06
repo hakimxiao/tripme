@@ -22,12 +22,12 @@ Sentry.init({
 
   sendDefaultPii: true,
 
-  tracesSampleRate: 1.0,
+  tracesSampleRate: __DEV__ ? 1.0 : 0.2,
 
   enableLogs: true,
 
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
+  replaysSessionSampleRate: __DEV__ ? 0.1 : 0.05,
+  replaysOnErrorSampleRate: __DEV__ ? 1.0 : 0.5,
 
   integrations: [navigationIntegration, Sentry.mobileReplayIntegration()],
 });
