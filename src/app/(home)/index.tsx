@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 
 const index = () => {
   return (
-    <View>
+    <View className="bg-purple-500">
       <Text>index</Text>
     </View>
   );

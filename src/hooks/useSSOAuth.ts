@@ -1,8 +1,11 @@
 import { useSSO } from "@clerk/expo";
 import * as AuthSession from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
 import { useCallback, useState } from "react";
 
 type SSOStrategy = "oauth_google" | "oauth_apple";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export function useSSOAuth() {
   const { startSSOFlow } = useSSO();

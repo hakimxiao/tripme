@@ -46,38 +46,78 @@ export async function POST(request: Request) {
       "svix-timestamp": svixTimestamp,
       "svix-signature": svixSignature,
     }) as ClerkUserEvent;
-  } catch {
+  } catch (error) {
+    console.error("[clerk-webhook] Invalid signature", error);
     return new Response("Invalid signature", { status: 400 });
   }
 
   const data = event.data;
+  console.info("[clerk-webhook] Received event", {
+    type: event.type,
+    userId: data.id,
+  });
 
   // Hand off to Inngest; the background functions do the DB writes.
-  if (event.type === "user.created" || event.type === "user.updated") {
-    const emails = data.email_addresses ?? [];
-    const primaryEmail =
-      emails.find((e) => e.id === data.primary_email_address_id) ?? emails[0];
-    const name =
-      [data.first_name, data.last_name].filter(Boolean).join(" ") || null;
+  try {
+    if (event.type === "user.created" || event.type === "user.updated") {
+      const emails = data.email_addresses ?? [];
+      const primaryEmail =
+        emails.find((e) => e.id === data.primary_email_address_id) ?? emails[0];
+      const name =
+        [data.first_name, data.last_name].filter(Boolean).join(" ") || null;
+      const eventName =
+        event.type === "user.created"
+          ? CLERK_USER_CREATED
+          : CLERK_USER_UPDATED;
 
-    await inngest.send({
-      name:
-        event.type === "user.created" ? CLERK_USER_CREATED : CLERK_USER_UPDATED,
-      data: {
-        id: data.id,
-        email: primaryEmail?.email_address ?? "",
-        name,
-        imageUrl: data.image_url ?? null,
-      },
-    });
-  } else if (event.type === "user.deleted") {
-    await inngest.send({
-      name: CLERK_USER_DELETED,
-      data: {
-        id: data.id,
-      },
-    });
+      const result = await inngest.send({
+        name: eventName,
+        data: {
+          id: data.id,
+          email: primaryEmail?.email_address ?? "",
+          name,
+          imageUrl: data.image_url ?? null,
+        },
+      });
+
+      console.info("[clerk-webhook] Sent event to Inngest", {
+        clerkType: event.type,
+        inngestName: eventName,
+        ids: result.ids,
+      });
+
+      return Response.json({
+        ok: true,
+        clerkType: event.type,
+        inngestName: eventName,
+        ids: result.ids,
+      });
+    } else if (event.type === "user.deleted") {
+      const result = await inngest.send({
+        name: CLERK_USER_DELETED,
+        data: {
+          id: data.id,
+        },
+      });
+
+      console.info("[clerk-webhook] Sent event to Inngest", {
+        clerkType: event.type,
+        inngestName: CLERK_USER_DELETED,
+        ids: result.ids,
+      });
+
+      return Response.json({
+        ok: true,
+        clerkType: event.type,
+        inngestName: CLERK_USER_DELETED,
+        ids: result.ids,
+      });
+    }
+  } catch (error) {
+    console.error("[clerk-webhook] Failed to send event to Inngest", error);
+    return new Response("Failed to send event to Inngest", { status: 502 });
   }
 
-  return new Response("ok", { status: 200 });
+  console.info("[clerk-webhook] Ignored event", { type: event.type });
+  return Response.json({ ok: true, ignored: true, clerkType: event.type });
 }
