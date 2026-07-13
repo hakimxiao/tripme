@@ -30,3 +30,14 @@ export type ClerkUserUpdatedData = ClerkUserCreatedData;
 export type ClerkUserDeletedData = {
   id: string;
 };
+
+// Fired by `POST /api/trips` after a `pending` trip row is created. The
+// generate-trip function picks it up and runs the durable generation pipeline.
+export const TRIP_GENERATE = "trip/generate.requested" as const;
+
+// The generate-trip function only needs the trip id and the owner; all the
+// generation inputs are read back from the `trips` row for a single source of truth.
+export type TripGenerateData = {
+  tripId: string;
+  userId: string;
+};

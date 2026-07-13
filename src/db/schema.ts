@@ -56,6 +56,7 @@ export const trips = pgTable("trips", {
   destination: text("destination").notNull(),
   startDate: date("start_date").notNull(),
   numDays: integer("num_days").notNull(),
+  numTravelers: integer("num_travelers").notNull(),
   budgetTier: budgetTierEnum("budget_tier").notNull(),
   // Interest/style tags picked in the form (e.g. ["Beaches", "Food & drink"]).
   interests: jsonb("interests").$type<string[]>().notNull().default([]),

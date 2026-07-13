@@ -15,60 +15,61 @@
 ## Phase 0 — Foundations
 
 - [ ] Read Expo v56 docs for API routes / server output (per `AGENTS.md`)
-- [ ] Set `web.output: "server"` in `app.json` (enables API routes)
-- [ ] Install Expo-native deps: `@sentry/react-native`, `react-native-maps`, `expo-secure-store`, `expo-web-browser`, `expo-auth-session`, `expo-crypto`, `expo-apple-authentication`
-- [ ] Install JS/server deps: `@clerk/expo`, `drizzle-orm`, `@neondatabase/serverless`, `inngest`, `openai`, `imagekit`, `svix`, `zod`
-- [ ] Install dev deps: `drizzle-kit`, `dotenv`
-- [ ] Create `.env` + `.env.example` with all keys (Clerk, Neon, OpenAI, ImageKit, Unsplash, Sentry, Inngest)
-- [ ] Add Clerk + relevant config plugins to `app.json`
-- [ ] Initialize Sentry (client + API routes)
+- [x] Set `web.output: "server"` in `app.json` (enables API routes)
+- [x] Install Expo-native deps: `@sentry/react-native`, `react-native-maps`, `expo-secure-store`, `expo-web-browser`, `expo-auth-session`, `expo-crypto`, `expo-apple-authentication`
+- [~] Install JS/server deps: `@clerk/expo` ✅ · `drizzle-orm` ✅ · `@neondatabase/serverless` ✅ · `inngest` ✅ · `svix` ✅ · `openai`, `imagekit`, `zod` (deferred to their phases)
+- [x] Install dev deps: `drizzle-kit`, `dotenv`
+- [x] Create `.env` + `.env.example` with all keys (Clerk, Neon, OpenAI, ImageKit, Unsplash, Sentry, Inngest)
+- [x] Add Clerk + relevant config plugins to `app.json` (`@clerk/expo`, `expo-secure-store`, `expo-web-browser`, Sentry)
+- [~] Initialize Sentry (client done in `_layout.tsx`; API routes pending — no `+api.ts` routes yet)
 - [ ] Set up `src/lib/env.ts` for typed env access
 - **DoD:** App boots on iOS simulator; server API route returns 200; Sentry receives a test event.
 
 ## Phase 1 — Auth & User Sync
 
-- [ ] `ClerkProvider` + `tokenCache` wired into `src/app/_layout.tsx`
-- [ ] Route protection: redirect signed-out → auth, signed-in → app
-- [ ] Sign-in screen with **Google** (`oauth_google`) via `useSSO`
-- [ ] Sign-in screen with **Apple** (`oauth_apple`) via `useSSO`
-- [ ] Configure redirect URI / scheme (`triply`) for native SSO
-- [ ] Sign-out action
-- [ ] Clerk webhook API route (`/api/webhooks/clerk+api.ts`) verifying with `svix`
-- [ ] Webhook upserts `user.created` / `user.updated` → Neon `users`
-- [ ] Webhook handles `user.deleted` → remove/soft-delete user
+- [x] `ClerkProvider` + `tokenCache` wired into `src/app/_layout.tsx`
+- [x] Route protection: redirect signed-out → auth, signed-in → app (`(auth)/_layout.tsx` + `(home)/_layout.tsx`)
+- [x] Single auth screen (`(auth)/sign-in.tsx`) — **Google** + **Apple** both live on one page via `useSSO` (`hooks/useSSOAuth.ts`)
+  - [x] **Google** (`oauth_google`)
+  - [x] **Apple** (`oauth_apple`)
+- [x] Configure redirect URI / scheme (`triply`) for native SSO (`AuthSession.makeRedirectUri()`)
+- [x] Sign-out action (`(home)/index.tsx` via `useClerk().signOut`)
+- [x] Clerk webhook API route (`/api/webhooks/clerk+api.ts`) verifying with `svix`
+- [x] Webhook upserts `user.created` / `user.updated` → Neon `users`
+- [x] Webhook handles `user.deleted` → remove/soft-delete user
 - [ ] Lazy-create fallback: first authed request upserts user if missing
 - **DoD:** Sign in with Google AND Apple; a `users` row appears in Neon via webhook; sign-out works.
 
 ## Phase 2 — Schema & Data Layer
 
-- [ ] Drizzle config (`drizzle.config.ts`) pointed at Neon
-- [ ] Neon serverless client (`src/db/index.ts`)
-- [ ] `users` table (Clerk userId PK, email, name, imageUrl, timestamps)
-- [ ] `trips` table (userId FK, destination, startDate, numDays, numTravelers, budgetTier enum, interests, status enum, coverImageUrl, itinerary jsonb, budgetBreakdown jsonb, errorMessage, timestamps)
-- [ ] `chat_messages` table (tripId FK cascade, role, content, createdAt)
-- [ ] `generation_usage` table/counter (per user per day) for safety cap
-- [ ] Zod schemas / TS types for `itinerary` and `budgetBreakdown` jsonb shapes
-- [ ] Generate + run migrations against Neon
-- [ ] Typed DB helpers, all scoped by authenticated `userId`
+- [x] Drizzle config (`drizzle.config.ts`) pointed at Neon
+- [x] Neon serverless client (`src/db/index.ts`)
+- [x] `users` table (Clerk userId PK, email, name, imageUrl, timestamps)
+- [x] `trips` table (userId FK, destination, startDate, numDays, numTravelers, budgetTier enum, interests, status enum, coverImageUrl, itinerary jsonb, budgetBreakdown jsonb, errorMessage, timestamps)
+- [x] `chat_messages` table (tripId FK cascade, role, content, createdAt)
+- [x] `generation_usage` table/counter (per user per day) for safety cap
+- [x] Zod schemas / TS types for `itinerary` and `budgetBreakdown` jsonb shapes (`src/lib/itinerary.ts`)
+- [x] Generate + run migrations against Neon (`db:push`)
+- [x] Typed DB helpers, all scoped by authenticated `userId` (routes filter by `userId`; `src/lib/usage.ts`)
 - **DoD:** Migrations applied on Neon; helper can create/read a trip scoped to a user.
 
 ## Phase 3 — Generation Pipeline
 
-- [ ] Generate-trip form screen: destination, travel dates, # days, # travelers, budget tier (Low/Med/Luxury), interests/style tags
-- [ ] Client-side validation of the form
-- [ ] `POST /api/trips+api.ts`: auth → safety-cap check → create `trip` (status `pending`) → trigger Inngest event
-- [ ] Inngest client (`src/inngest/client.ts`) + endpoint route (`/api/inngest+api.ts`)
-- [ ] Inngest `generate-trip` function:
-  - [ ] Set status `generating`
-  - [ ] Call OpenAI (mini) with structured itinerary schema
-  - [ ] Validate AI output against Zod schema
-  - [ ] Fetch destination cover image (Unsplash) → upload/optimize via ImageKit
-  - [ ] Persist itinerary + budgetBreakdown + coverImageUrl → status `ready`
-  - [ ] Retries on failure; terminal failure → status `failed` + errorMessage (quota untouched)
-- [ ] Silent safety cap (20 generations/user/day) enforced in `POST /api/trips`
-- [ ] Loading screen polls `GET /api/trips/[id]/status+api.ts`
-- [ ] On `ready` → navigate to trip detail; on `failed` → error + "Try again"
-- [ ] Run against **local Inngest dev server** (no EAS Hosting in v1)
+- [x] Generate-trip form screen: destination, travel dates, # days, # travelers, budget tier (Low/Med/Luxury), interests/style tags
+- [x] Client-side validation of the form (button gated on destination + start date; server re-validates via Zod)
+- [x] `POST /api/trips+api.ts`: auth → safety-cap check → create `trip` (status `pending`) → trigger Inngest event
+- [x] Inngest client (`src/inngest/client.ts`) + endpoint route (`/api/inngest+api.ts`)
+- [x] Inngest `generate-trip` function:
+  - [x] Set status `generating`
+  - [x] Call OpenAI (mini) with structured itinerary schema (`src/lib/openai.ts`, `gpt-4o-mini`)
+  - [x] Validate AI output against Zod schema (Structured Outputs + `tripGenerationSchema.parse`)
+  - [x] Fetch destination cover image (Unsplash) → upload/optimize via ImageKit (`src/lib/images.ts`)
+  - [x] Persist itinerary + budgetBreakdown + coverImageUrl → status `ready`
+  - [x] Retries on failure; terminal failure → status `failed` + errorMessage (quota refunded via `onFailure`)
+- [x] Silent safety cap (20 generations/user/day) enforced in `POST /api/trips` (`src/lib/usage.ts`)
+- [x] Loading screen polls `GET /api/trips/[id]/status+api.ts` (`src/app/trip-loading.tsx`)
+- [x] On `ready` → navigate to trip detail; on `failed` → error + "Try again"
+- [ ] Run against **local Inngest dev server** (no EAS Hosting in v1) — needs manual run: `npm run ios` + `npm run inngest`
 - **DoD:** Submitting the form generates a real trip end-to-end locally; status flips pending→generating→ready; forced failure shows graceful error.
 
 ## Phase 4 — Trip Detail & Management
