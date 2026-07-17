@@ -93,7 +93,7 @@ export default function Home() {
             </Text>
 
             <Pressable
-              onPress={() => router.push("/generate-trip")}
+              // onPress={() => router.push("/generate-trip")}
               className="mt-5 flex-row items-center gap-2 self-start rounded-full bg-white px-5 py-3"
             >
               <Text className="text-[15px] font-bold text-[#2F6BE4]">
