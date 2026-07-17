@@ -7,7 +7,7 @@ import { SymbolView } from "expo-symbols";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const worlImage = require("../../../assets/images/world.png");
+const worldImage = require("../../../assets/images/world.png");
 
 const POPULAR_DESTINATIONS = [
   {
@@ -62,7 +62,7 @@ export default function Home() {
         {/* AI Trip Planner card */}
         <View className="mx-6 mt-6 overflow-hidden rounded-[28px] bg-[#5B8DEF]">
           <Image
-            source={worlImage}
+            source={worldImage}
             contentFit="contain"
             style={{
               position: "absolute",
@@ -85,11 +85,12 @@ export default function Home() {
               adjustsFontSizeToFit
               className="mt-3 text-[26px] font-extrabold tracking-tight text-white"
             >
-              Rencanakan perjalanan berikutnya
+              Rencanakan liburanmu
             </Text>
 
             <Text className="mt-2 text-[14px] leading-5 text-white/90">
-              Beri tahu lokasi dan waktunya — kami susun rencana perjalanannya.
+              Beri tahu lokasi dan waktunya — ai akan atur rencana
+              perjalanannya.
             </Text>
 
             <Pressable
@@ -107,11 +108,11 @@ export default function Home() {
         {/* Your trips */}
         <View className="mt-8 flex-row items-center justify-between px-6">
           <Text className="text-2xl font-extrabold tracking-tight text-[#0F1B2D]">
-            Perjalananmu
+            Perjalanan Mu
           </Text>
           <Pressable className="flex-row items-center gap-1">
             <Text className="text-[16px] font-semibold text-[#2F6BE4]">
-              Lihat semuanya
+              Lihat semua
             </Text>
             <SymbolView
               name="chevron.right"
@@ -124,8 +125,7 @@ export default function Home() {
 
         {/* Trip card */}
         <View
-          className="mx-6 mt-4 overflow-hidden rounded-[24px] bg-white
-        "
+          className="mx-6 mt-4 overflow-hidden rounded-[24px] bg-white"
           style={{
             shadowColor: "#0F1B2D",
             shadowOpacity: 0.1,
@@ -155,7 +155,7 @@ export default function Home() {
             <View className="absolute right-3 top-3 flex-row items-center gap-1.5 rounded-full bg-black/45 px-3 py-1.5">
               <SymbolView name="calendar" size={13} tintColor="#FFFFFF" />
               <Text className="text-[13px] font-semibold text-white">
-                3 Hari
+                3 days
               </Text>
             </View>
 
@@ -178,71 +178,78 @@ export default function Home() {
             <View className="flex-row items-center gap-2">
               <SymbolView name="wallet.bifold" size={17} tintColor="#8A94A6" />
               <Text className="text-[15px] font-medium text-[#8A94A6]">
-                Est. Rp.9.763.000 / Orang
+                Est. Rp. 10.500k / orang
               </Text>
-              <Pressable className="flex-row items-center gap-1">
-                <Text className="text-[15px] font-semibold text-[#2F6BE4]">
-                  Lihat
-                </Text>
-                <SymbolView
-                  name="chevron.right"
-                  size={12}
-                  tintColor="#2F6BE4"
-                  weight="semibold"
-                />
-              </Pressable>
             </View>
+            <Pressable className="flex-row items-center gap-1">
+              <Text className="text-[15px] font-semibold text-[#2F6BE4]">
+                Lihat
+              </Text>
+              <SymbolView
+                name="chevron.right"
+                size={12}
+                tintColor="#2F6BE4"
+                weight="semibold"
+              />
+            </Pressable>
           </View>
-
-          {/* Popular destination */}
-          <Text className="mt-8 px-6 text-2xl font-extrabold tracking-tight text-[#0F1B2D]">
-            Destinasi Populer
-          </Text>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: 24,
-              paddingTop: 16,
-              gap: 14,
-            }}
-          >
-            {POPULAR_DESTINATIONS.map((dest) => (
-              <View
-                key={dest.id}
-                className="h-[230px] w-[168px] overflow-hidden rounded-[24px]"
-              >
-                <Image
-                  source={dest.image}
-                  contentFit="cover"
-                  style={{ width: "100%", height: "100%" }}
-                />
-                <LinearGradient
-                  colors={["transparent", "rgba(0,0,0,0.5)"]}
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: 120,
-                  }}
-                />
-
-                {/* Rating badge */}
-                <View className="absolute right-2.5 top-2.5 flex-row items-center gap-1 rounded-full bg-black/45 px-2.5 py-1">
-                  <SymbolView name="star.fill" size={12} tintColor="#F5B942" />
-                  <Text className="text-[19px] font-extrabold tracking-tight text-white">
-                    {dest.name}
-                  </Text>
-                  <Text className="text-[13px] font-medium text-white/85">
-                    {dest.country}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
         </View>
+
+        {/* Popular destinations */}
+        <Text className="mt-8 px-6 text-2xl font-extrabold tracking-tight text-[#0F1B2D]">
+          Destinasi populer
+        </Text>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingTop: 16,
+            gap: 14,
+          }}
+        >
+          {POPULAR_DESTINATIONS.map((dest) => (
+            <View
+              key={dest.id}
+              className="h-[230px] w-[168px] overflow-hidden rounded-[24px]"
+            >
+              <Image
+                source={dest.image}
+                contentFit="cover"
+                style={{ width: "100%", height: "100%" }}
+              />
+              <LinearGradient
+                colors={["transparent", "rgba(0,0,0,0.5)"]}
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 120,
+                }}
+              />
+
+              {/* Rating badge */}
+              <View className="absolute right-2.5 top-2.5 flex-row items-center gap-1 rounded-full bg-black/45 px-2.5 py-1">
+                <SymbolView name="star.fill" size={12} tintColor="#F5B942" />
+                <Text className="text-[13px] font-semibold text-white">
+                  {dest.rating}
+                </Text>
+              </View>
+
+              {/* Name */}
+              <View className="absolute bottom-3 left-3">
+                <Text className="text-[19px] font-extrabold tracking-tight text-white">
+                  {dest.name}
+                </Text>
+                <Text className="text-[13px] font-medium text-white/85">
+                  {dest.country}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
       </ScrollView>
     </View>
   );
