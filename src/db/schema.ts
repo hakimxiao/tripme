@@ -30,9 +30,9 @@ export type NewUser = typeof users.$inferInsert;
 
 // Budget tier the user picks in the form. Values match the AI prompt vocabulary.
 export const budgetTierEnum = pgEnum("budget_tier", [
-  "budget",
-  "comfort",
-  "luxury",
+  "ekonomis",
+  "nyaman",
+  "mewah",
 ]);
 
 // Lifecycle of a trip's generation. `pending` → `generating` → `ready` | `failed`.

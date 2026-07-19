@@ -38,7 +38,7 @@ const createTripSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, "startDate must be YYYY-MM-DD"),
   numDays: z.number().int().min(1).max(30),
   numTravelers: z.number().int().min(1).max(20),
-  budgetTier: z.enum(["budget", "comfort", "luxury"]),
+  budgetTier: z.enum(["ekonomis", "nyaman", "mewah"]),
   interests: z.array(z.string().trim().min(1)).max(20).default([]),
   pace: z.string().trim().min(1).max(40).nullable().default(null),
 });

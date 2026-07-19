@@ -24,17 +24,17 @@ export type TripPlanInput = {
   startDate: string; // YYYY-MM-DD
   numDays: number;
   numTravelers: number;
-  budgetTier: "budget" | "comfort" | "luxury";
+  budgetTier: "ekonomis" | "nyaman" | "mewah";
   interests: string[];
   pace: string | null;
 };
 
 const BUDGET_GUIDANCE: Record<TripPlanInput["budgetTier"], string> = {
-  budget:
+  ekonomis:
     "budget-conscious: hostels/3-star stays, street food and casual eateries, mostly free or low-cost attractions",
-  comfort:
+  nyaman:
     "mid-range: comfortable 3-4 star hotels, a mix of casual and nicer restaurants, paid attractions where worthwhile",
-  luxury:
+  mewah:
     "luxury: 4-5 star hotels and standout stays, fine dining, premium experiences and private tours",
 };
 

@@ -54,7 +54,7 @@ export type CreateTripInput = {
   startDate: string; //YYY-MM-DD
   numDays: number;
   numTravelers: number;
-  budgetTier: "budget" | "comfort" | "luxury";
+  budgetTier: "ekonomis" | "nyaman" | "mewah";
   interests: string[];
   pace: string | null;
 };
