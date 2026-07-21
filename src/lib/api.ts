@@ -25,28 +25,42 @@ async function authedFetch(
   init?: RequestInit,
 ): Promise<Response> {
   const token = await getToken();
-  const res = await fetch(path, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init?.headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-  if (!res.ok) {
-    let message = `Request failed (${res.status})`;
+  try {
+    const res = await fetch(path, {
+      ...init,
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers,
+      },
+    });
 
-    try {
-      const data = (await res.json()) as { error?: string };
-      if (data?.error) message = data.error;
-    } catch {
-      // non-JSON error body — keep the default message
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      let message = `Request failed (${res.status})`;
+
+      try {
+        const data = (await res.json()) as { error?: string };
+        if (data?.error) message = data.error;
+      } catch {
+        // non-JSON error body — keep the default message
+      }
+      throw new ApiError(message, res.status);
     }
-    throw new ApiError(message, res.status);
-  }
 
-  return res;
+    return res;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === "AbortError") {
+      throw new ApiError("Waktu permintaan habis (timeout). Silakan periksa koneksi internet Anda atau coba lagi.", 408);
+    }
+    throw error;
+  }
 }
 
 export type CreateTripInput = {

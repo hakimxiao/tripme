@@ -6,6 +6,7 @@
     "@clerk/backend": "^3.9.0",
     "@clerk/expo": "^3.6.3",
     "@expo/ui": "~56.0.22",
+    "@expo/vector-icons": "^15.1.1",
     "@neondatabase/serverless": "^1.1.0",
     "@sentry/react-native": "~7.11.0",
     "drizzle-orm": "^0.45.2",

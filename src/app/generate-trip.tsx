@@ -2,11 +2,11 @@ import { createTrip, type CreateTripInput } from "@/lib/api";
 import { useAuth } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SymbolView } from "expo-symbols";
+import { AppIcon } from "@/components/ui/AppIcon";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   Text,
@@ -75,6 +75,7 @@ export default function GenerateTrip() {
   const router = useRouter();
   const { getToken } = useAuth();
   const [submitting, setSubmitting] = useState(false);
+  const [errorState, setErrorState] = useState<string | null>(null);
 
   const today = new Date();
   const todayStamp = atMidnight(
@@ -182,14 +183,26 @@ export default function GenerateTrip() {
       });
     } catch (error) {
       setSubmitting(false);
-      Alert.alert(
-        "Gagal membuat trip",
+      setErrorState(
         error instanceof Error
           ? error.message
           : "Ada sesuatu yang salah. Coba nanti.",
       );
     }
   };
+
+  if (errorState) {
+    return (
+      <ErrorScreen
+        errorMessage={errorState}
+        onRetry={() => {
+          setErrorState(null);
+          onGenerate();
+        }}
+        onBack={() => setErrorState(null)}
+      />
+    );
+  }
 
   return (
     <View className="flex-1 bg-white">
@@ -205,7 +218,7 @@ export default function GenerateTrip() {
             hitSlop={10}
             className="absolute left-5 size-9 items-center justify-center rounded-full bg-[#F1F3F7]"
           >
-            <SymbolView
+            <AppIcon
               name="chevron.left"
               size={17}
               tintColor={INK}
@@ -229,7 +242,7 @@ export default function GenerateTrip() {
         {/* AI intro  */}
         <View className="flex-row gap-3">
           <View className="size-12 items-center justify-center rounded-full bg-[#3E7BF0]">
-            <SymbolView name="sparkles" size={22} tintColor="#FFFFFF" />
+            <AppIcon name="sparkles" size={22} tintColor="#FFFFFF" />
           </View>
           <View
             className="flex-1 rounded-[20px] border p-4"
@@ -253,7 +266,7 @@ export default function GenerateTrip() {
           className="mt-3 h-14 flex-row items-center gap-2.5 rounded-2xl border px-4"
           style={{ borderColor: BORDER }}
         >
-          <SymbolView name="mappin" size={18} tintColor={MUTED} />
+          <AppIcon name="mappin" size={18} tintColor={MUTED} />
           <TextInput
             value={destination}
             onChangeText={setDestination}
@@ -272,7 +285,7 @@ export default function GenerateTrip() {
           style={{ borderColor: BORDER }}
         >
           <View className="flex-row items-center gap-2.5">
-            <SymbolView name="calendar" size={18} tintColor={MUTED} />
+            <AppIcon name="calendar" size={18} tintColor={MUTED} />
             <Text className="text-[17px] text-[#8A94A6]">Pilih tanggalnya</Text>
           </View>
 
@@ -284,7 +297,7 @@ export default function GenerateTrip() {
               className="size-9 items-center justify-center rounded-full bg-[#F1F3F7]"
               style={{ opacity: canGoPrev ? 1 : 0.4 }}
             >
-              <SymbolView
+              <AppIcon
                 name="chevron.left"
                 size={15}
                 tintColor={INK}
@@ -300,7 +313,7 @@ export default function GenerateTrip() {
               hitSlop={8}
               className="h-9 w-9 items-center justify-center rounded-full bg-[#F1F3F7]"
             >
-              <SymbolView
+              <AppIcon
                 name="chevron.right"
                 size={15}
                 tintColor={INK}
@@ -428,7 +441,7 @@ export default function GenerateTrip() {
           style={{ borderColor: BORDER }}
         >
           <View className="flex-row items-center gap-2.5">
-            <SymbolView name="person.2" size={20} tintColor={INK} />
+            <AppIcon name="person.2" size={20} tintColor={INK} />
             <Text className="text-[17px] font-semibold text-[#0F1B2D]">
               {travelers} wisatawan
             </Text>
@@ -439,7 +452,7 @@ export default function GenerateTrip() {
               hitSlop={6}
               className="h-9 w-9 items-center justify-center rounded-full bg-[#F1F3F7]"
             >
-              <SymbolView
+              <AppIcon
                 name="minus"
                 size={16}
                 tintColor={INK}
@@ -451,7 +464,7 @@ export default function GenerateTrip() {
               hitSlop={6}
               className="h-9 w-9 items-center justify-center rounded-full bg-[#F1F3F7]"
             >
-              <SymbolView
+              <AppIcon
                 name="plus"
                 size={16}
                 tintColor={INK}
@@ -531,7 +544,7 @@ export default function GenerateTrip() {
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <>
-              <SymbolView name="sparkles" size={18} tintColor="#FFFFFF" />
+              <AppIcon name="sparkles" size={18} tintColor="#FFFFFF" />
               <Text className="text-[17px] font-bold text-white">
                 Buat Rencana Perjalanan
               </Text>

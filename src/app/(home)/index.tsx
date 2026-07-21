@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SymbolView } from "expo-symbols";
+import { AppIcon } from "@/components/ui/AppIcon";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -74,7 +74,7 @@ export default function Home() {
           />
           <View className="py-6 pl-6" style={{ paddingRight: 150 }}>
             <View className="flex-row items-center gap-1.5">
-              <SymbolView name="sparkles" size={16} tintColor="#FFFFFF" />
+              <AppIcon name="sparkles" size={16} tintColor="#FFFFFF" />
               <Text className="text-[15px] font-semibold text-white">
                 AI Trip Planner
               </Text>
@@ -100,7 +100,7 @@ export default function Home() {
               <Text className="text-[15px] font-bold text-[#2F6BE4]">
                 Ayo mulai
               </Text>
-              <SymbolView name="arrow.right" size={15} tintColor="#2F6BE4" />
+              <AppIcon name="arrow.right" size={15} tintColor="#2F6BE4" />
             </Pressable>
           </View>
         </View>
@@ -114,7 +114,7 @@ export default function Home() {
             <Text className="text-[16px] font-semibold text-[#2F6BE4]">
               Lihat semua
             </Text>
-            <SymbolView
+            <AppIcon
               name="chevron.right"
               size={13}
               tintColor="#2F6BE4"
@@ -153,7 +153,7 @@ export default function Home() {
 
             {/* Days badge */}
             <View className="absolute right-3 top-3 flex-row items-center gap-1.5 rounded-full bg-black/45 px-3 py-1.5">
-              <SymbolView name="calendar" size={13} tintColor="#FFFFFF" />
+              <AppIcon name="calendar" size={13} tintColor="#FFFFFF" />
               <Text className="text-[13px] font-semibold text-white">
                 3 days
               </Text>
@@ -165,7 +165,7 @@ export default function Home() {
                 3 Hari di Osaka
               </Text>
               <View className="mt-0.5 flex-row items-center gap-1">
-                <SymbolView name="mappin" size={14} tintColor="#FFFFFF" />
+                <AppIcon name="mappin" size={14} tintColor="#FFFFFF" />
                 <Text className="text-[15px] font-medium text-white/95">
                   Osaka
                 </Text>
@@ -176,7 +176,7 @@ export default function Home() {
           {/* Footer */}
           <View className="flex-row items-center justify-between px-4 py-3.5">
             <View className="flex-row items-center gap-2">
-              <SymbolView name="wallet.bifold" size={17} tintColor="#8A94A6" />
+              <AppIcon name="wallet.bifold" size={17} tintColor="#8A94A6" />
               <Text className="text-[15px] font-medium text-[#8A94A6]">
                 Est. Rp. 10.500k / orang
               </Text>
@@ -185,7 +185,7 @@ export default function Home() {
               <Text className="text-[15px] font-semibold text-[#2F6BE4]">
                 Lihat
               </Text>
-              <SymbolView
+              <AppIcon
                 name="chevron.right"
                 size={12}
                 tintColor="#2F6BE4"
@@ -232,7 +232,7 @@ export default function Home() {
 
               {/* Rating badge */}
               <View className="absolute right-2.5 top-2.5 flex-row items-center gap-1 rounded-full bg-black/45 px-2.5 py-1">
-                <SymbolView name="star.fill" size={12} tintColor="#F5B942" />
+                <AppIcon name="star.fill" size={12} tintColor="#F5B942" />
                 <Text className="text-[13px] font-semibold text-white">
                   {dest.rating}
                 </Text>

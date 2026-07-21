@@ -7,7 +7,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SymbolView, type SymbolViewProps } from "expo-symbols";
+import { AppIcon, type AppIconProps } from "@/components/ui/AppIcon";
 import { useEffect, useRef, useState } from "react";
 import {
   ActionSheetIOS,
@@ -37,7 +37,7 @@ const aiLogo = require("../../../assets/images/ai-logo.png");
 const { width: SCREEN_W } = Dimensions.get("window");
 const COVER_ARCH = 30;
 
-const PLACE_ICON: Record<Place["kind"], SymbolViewProps["name"]> = {
+const PLACE_ICON: Record<Place["kind"], AppIconProps["name"]> = {
   attraction: "camera",
   restaurant: "fork.knife",
   activity: "figure.walk",
@@ -316,7 +316,7 @@ export default function TripDetail() {
             style={{ top: insets.top + 4 }}
             className="absolute left-5 h-11 w-11 items-center justify-center rounded-full bg-white"
           >
-            <SymbolView
+            <AppIcon
               name="chevron.left"
               size={18}
               tintColor={INK}
@@ -329,7 +329,7 @@ export default function TripDetail() {
             style={{ top: insets.top + 4, right: 72 }}
             className="absolute h-11 w-11 items-center justify-center rounded-full bg-white"
           >
-            <SymbolView
+            <AppIcon
               name="camera.fill"
               size={22}
               tintColor={INK}
@@ -342,7 +342,7 @@ export default function TripDetail() {
             style={{ top: insets.top + 4 }}
             className="absolute right-5 h-11 w-11 items-center justify-center rounded-full bg-white"
           >
-            <SymbolView
+            <AppIcon
               name="trash"
               size={20}
               tintColor="#E5484D"
@@ -356,7 +356,7 @@ export default function TripDetail() {
             style={{ bottom: COVER_ARCH + 20 }}
           >
             <View className="flex-row items-center gap-1.5">
-              <SymbolView name="mappin" size={15} tintColor="#FFFFFF" />
+              <AppIcon name="mappin" size={15} tintColor="#FFFFFF" />
               <Text className="text-[16px] font-semibold text-white">
                 {cityShort(trip.destination)}
               </Text>
@@ -453,7 +453,7 @@ export default function TripDetail() {
                   shadowOffset: { width: 0, height: 2 },
                 }}
               >
-                <SymbolView name="location.fill" size={18} tintColor={BLUE} />
+                <AppIcon name="location.fill" size={18} tintColor={BLUE} />
               </Pressable>
             </View>
           </>
@@ -508,7 +508,7 @@ export default function TripDetail() {
                           </Text>
                         ) : null}
                       </View>
-                      <SymbolView
+                      <AppIcon
                         name={open ? "chevron.up" : "chevron.down"}
                         size={15}
                         tintColor={MUTED}
@@ -528,7 +528,7 @@ export default function TripDetail() {
                               className="flex-row gap-3"
                             >
                               <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-full bg-white">
-                                <SymbolView
+                                <AppIcon
                                   name={PLACE_ICON[place.kind]}
                                   size={16}
                                   tintColor={BLUE}
@@ -663,7 +663,7 @@ function StatCol({
   label,
   sub,
 }: {
-  icon: SymbolViewProps["name"];
+  icon: AppIconProps["name"];
   value: string;
   label: string;
   sub?: string;
@@ -674,7 +674,7 @@ function StatCol({
         className="h-14 w-14 items-center justify-center rounded-full"
         style={{ backgroundColor: BADGE_BG }}
       >
-        <SymbolView name={icon} size={24} tintColor={BLUE} />
+        <AppIcon name={icon} size={24} tintColor={BLUE} />
       </View>
       <Text className="mt-3 text-[20px] font-extrabold text-[#0F1B2D]">
         {value}

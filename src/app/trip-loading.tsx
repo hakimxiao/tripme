@@ -3,7 +3,8 @@ import { useAuth } from "@clerk/expo";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SFSymbol, SymbolView } from "expo-symbols";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
+import { AppIcon, AppIconProps } from "@/components/ui/AppIcon";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -19,7 +20,7 @@ const MAP_IMAGE = require("../../assets/images/trip-loading-map.png");
 // Progressive backoff between status polls (ms), capped at the last value.
 const POLL_DELAYS = [1500, 2000, 2500, 3000, 4000];
 
-type Step = { icon: SFSymbol; label: string };
+type Step = { icon: AppIconProps["name"]; label: string };
 
 const STEPS: Step[] = [
   { icon: "magnifyingglass", label: "Temukan destinasi" },
@@ -82,6 +83,8 @@ export default function TripLoading() {
     let active = true;
     let timeout: ReturnType<typeof setTimeout>;
     let attempt = 0;
+    const startTime = Date.now();
+    const MAX_POLL_TIME = 60000; // 60 seconds
 
     const poll = async () => {
       try {
@@ -100,6 +103,11 @@ export default function TripLoading() {
         if (!active) return;
       }
 
+      if (Date.now() - startTime > MAX_POLL_TIME) {
+        setError("Waktu pembuatan perjalanan habis. Server mungkin sedang sibuk.");
+        return;
+      }
+
       const delay = POLL_DELAYS[Math.min(attempt, POLL_DELAYS.length - 1)];
       attempt += 1;
       timeout = setTimeout(poll, delay);
@@ -115,39 +123,11 @@ export default function TripLoading() {
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center bg-white px-8">
-        <StatusBar style="dark" />
-        <View className="size-20 items-center justify-center rounded-full bg-[#FDECEC]">
-          <SymbolView
-            name="exclamationmark.triangle.fill"
-            size={34}
-            tintColor="#E5484D"
-          />
-        </View>
-        <Text className="mt-6 text-center text-[16px] leading-6 text-[#8A94A6]">
-          Terjadi kesalahan
-        </Text>
-        <Text className="mt-2 text-center text-[16px] leading-6 text-[#8A94A6]">
-          {error}
-        </Text>
-
-        <Pressable
-          onPress={() => router.replace("/generate-trip")}
-          className="mt-8 h-14 w-full flex-row items-center justify-center gap-2 rounded-full"
-          style={{ backgroundColor: BLUE }}
-        >
-          <SymbolView name="arrow.clockwise" size={18} tintColor="#FFFFFF" />
-          <Text className=" text-[17px] font-bold text-wrap">Coba lagi</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => router.replace("/")}
-          className="mt-3 h-12 items-center justify-center"
-        >
-          <Text className="text-[16px] font-semibold text-[#8A94A6]">
-            Kembali ke beranda
-          </Text>
-        </Pressable>
-      </View>
+      <ErrorScreen
+        errorMessage={error}
+        onRetry={() => router.replace("/generate-trip")}
+        onBack={() => router.replace("/")}
+      />
     );
   }
 
@@ -200,7 +180,7 @@ export default function TripLoading() {
                     borderColor: TRACK,
                   }}
                 >
-                  <SymbolView
+                  <AppIcon
                     name={step.icon}
                     size={24}
                     tintColor={isActive ? "#FFFFFF" : STEP_ICON}
