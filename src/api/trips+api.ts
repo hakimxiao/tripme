@@ -110,6 +110,12 @@ export async function POST(request: Request) {
   } catch (error) {
     // Roll back the reserved quota if we couldn't actually start the job.
     await refundGeneration(userId, usageDay()).catch(() => {});
+    // Clean up the trip row if it was inserted but the queue start failed, so we
+    // don't leave stale `status: "pending"` data behind. No-op if insert failed.
+    await db
+      .delete(trips)
+      .where(eq(trips.id, tripId))
+      .catch(() => {});
     console.error("[POST /api/trips] failed to create trip:", error);
     return Response.json(
       { error: "Failed to start trip generation" },

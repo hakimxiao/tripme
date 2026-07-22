@@ -6,8 +6,8 @@ import {
   budgetBreakdownSchema,
   daySchema,
   hotelSchema,
-  TripGeneration,
   type Day,
+  type TripGeneration,
 } from "./itinerary";
 
 // Mini tier everywhere (see PLAN spec). Structured Outputs are supported on this model.
@@ -51,7 +51,6 @@ type TripMeta = z.infer<typeof tripMetaSchema>;
 function addDays(startDate: string, offset: number): string {
   const d = new Date(`${startDate}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + offset);
-
   return d.toISOString().slice(0, 10);
 }
 
@@ -61,7 +60,6 @@ function contextLines(input: TripPlanInput): string {
     ? input.interests.join(", ")
     : "general sightseeing";
   const paceLine = input.pace ? `${input.pace} pace` : "a balanced pace";
-
   return [
     `Destination: ${input.destination}`,
     `Travelers: ${input.numTravelers}`,
@@ -116,7 +114,7 @@ async function generateDay(
   if (message?.refusal)
     throw new Error(`Model refused (day ${dayNumber}): ${message.refusal}`);
   if (!message?.parsed)
-    throw new Error(`Model returned no plan for day b${dayNumber}.`);
+    throw new Error(`Model returned no plan for day ${dayNumber}.`);
 
   return daySchema.parse(message.parsed);
 }
@@ -149,7 +147,17 @@ async function generateMeta(input: TripPlanInput): Promise<TripMeta> {
     throw new Error(`Model refused (meta): ${message.refusal}`);
   if (!message?.parsed) throw new Error("Model returned no trip meta.");
 
-  return tripMetaSchema.parse(message.parsed);
+  const meta = tripMetaSchema.parse(message.parsed);
+
+  // The model reports `totalPerPerson` separately from the per-category amounts and
+  // the two don't always agree. Derive the total from the categories so the exposed
+  // budget is always internally consistent.
+  meta.budgetBreakdown.totalPerPerson = meta.budgetBreakdown.categories.reduce(
+    (sum, category) => sum + category.amountPerPerson,
+    0,
+  );
+
+  return meta;
 }
 
 // Produces a validated itinerary + budget breakdown for the trip. The trip meta and
@@ -165,7 +173,6 @@ export async function generateTripPlan(
   const days: Day[] = [];
   const usedPlaces: string[] = [];
   const usedTitles: string[] = [];
-
   for (let i = 0; i < numDays; i++) {
     const day = await generateDay(
       input,

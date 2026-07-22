@@ -32,9 +32,19 @@ async function findUnsplashCover(
   url.searchParams.set("orientation", "landscape");
   url.searchParams.set("content_filter", "high");
 
-  const res = await fetch(url, {
-    headers: { Authorization: `Client-ID ${serverEnv.unsplashAccessKey}` },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { Authorization: `Client-ID ${serverEnv.unsplashAccessKey}` },
+      // Fail fast instead of hanging if Unsplash is slow/unresponsive.
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "TimeoutError") {
+      throw new Error("Unsplash search timed out");
+    }
+    throw error;
+  }
 
   if (!res.ok) {
     throw new Error(`Unsplash search failed: ${res.status} ${res.statusText}`);

@@ -3,6 +3,7 @@ import { trips } from "@/db/schema";
 import { TRIP_GENERATE, inngest } from "@/inngest/client";
 import { getAuthUserId, unauthorized } from "@/lib/auth";
 import { refundGeneration, reserveGeneration, usageDay } from "@/lib/usage";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 // Body sent by the generate-trip form. Kept in sync with the client payload in
@@ -81,6 +82,12 @@ export async function POST(request: Request) {
   } catch (error) {
     // Roll back the reserved quota if we couldn't actually start the job.
     await refundGeneration(userId, usageDay()).catch(() => {});
+    // Clean up the trip row if it was inserted but the queue start failed, so we
+    // don't leave stale `status: "pending"` data behind. No-op if insert failed.
+    await db
+      .delete(trips)
+      .where(eq(trips.id, tripId))
+      .catch(() => {});
     console.error("[POST /api/trips] failed to create trip:", error);
     return Response.json(
       { error: "Failed to start trip generation" },

@@ -100,8 +100,13 @@ export const generateTrip = inngest.createFunction(
         event: { data: TripGenerateData };
       };
       const { tripId, userId } = failure.event.data;
-      const message =
-        failure.error?.message ?? "Trip generation failed. Please try again.";
+      // Keep the raw failure only in internal logs — never surface it to clients.
+      console.error(
+        `[generate-trip] run failed for ${tripId}:`,
+        failure.error?.message,
+      );
+      // Generic, user-safe message persisted for the status API to expose.
+      const message = "Trip generation failed. Please try again.";
 
       await step.run("mark-failed", async () => {
         // Refund the reserved generation so a failed trip doesn't burn the daily cap.
