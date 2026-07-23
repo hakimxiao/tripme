@@ -1,56 +1,41 @@
-# Welcome to your Expo app 👋
+# Expo HAS CHANGED
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Read the exact versioned docs at https://docs.expo.dev/versions/v56.0.0/ before writing any code.
 
-## Get started
+# Stack
 
-1. Install dependencies
+**App**
 
-   ```bash
-   npm install
-   ```
+- Expo SDK 56 · React Native 0.85 · React 19.2 · TypeScript (strict)
+- Expo Router (file-based routing)
+- NativeWind v4 (styling)
 
-2. Start the app
+**Backend & services**
 
-   ```bash
-   npx expo start
-   ```
+- **Database:** Postgres on [Neon](https://neon.tech)
+- **ORM:** [Drizzle](https://orm.drizzle.team)
+- **Auth:** [Clerk](https://clerk.com)
+- **Images:** [ImageKit](https://imagekit.io) for image optimization/delivery
+- **Background jobs:** [Inngest](https://www.inngest.com)
+- **Error tracking & monitoring:** [Sentry](https://sentry.io)
 
-In the output, you'll find options to open the app in a
+# Conventions
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **NEVER run the app yourself** (`npm run ios`/`android`/`start`, `expo start`, etc.). The dev server is always already running in a separate terminal. Do not start, restart, or build the app.
+- **Native tabs are mandatory.** Always use native tabs for tab navigation — never a JavaScript/custom tab bar. This is a hard rule for this project.
+- **Styling:** NativeWind v4 — use `className`, NOT `StyleSheet.create`.
+- **Routing:** Expo Router, file-based. Screens live in `src/app`. Typed routes are enabled.
+- **UI:** Native-first. Prefer `@expo/ui`, `expo-symbols` (SF Symbols), and `expo-glass-effect` over custom views.
+- **Images:** use `expo-image` for rendering; serve through ImageKit for optimization.
+- **Auth:** Clerk — use `@clerk/clerk-expo`. Store tokens via `expo-secure-store` token cache.
+- **React Compiler is ON** — do NOT manually add `useMemo` / `useCallback` / `React.memo`.
+- **Imports:** use the `@/` alias (`@/*` → `src/*`).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+# Commands
 
-## Get a fresh project
+- `npm run ios` / `npm run android` — native dev build (uses expo-dev-client)
+- `npm run start` — dev server
+- `npm run lint`
+</content>
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+</invoke>

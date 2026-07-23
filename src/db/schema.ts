@@ -30,9 +30,9 @@ export type NewUser = typeof users.$inferInsert;
 
 // Budget tier the user picks in the form. Values match the AI prompt vocabulary.
 export const budgetTierEnum = pgEnum("budget_tier", [
-  "ekonomis",
-  "nyaman",
-  "mewah",
+  "budget",
+  "comfort",
+  "luxury",
 ]);
 
 // Lifecycle of a trip's generation. `pending` → `generating` → `ready` | `failed`.
@@ -97,6 +97,23 @@ export const chatMessages = pgTable("chat_messages", {
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type NewChatMessage = typeof chatMessages.$inferInsert;
 
+// Standalone transcript for the AI travel-companion assistant screen. Per-user
+// (not tied to a trip, unlike `chatMessages`) and cascades when the user is deleted.
+export const assistantMessages = pgTable("assistant_messages", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  role: chatRoleEnum("role").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type AssistantMessageRow = typeof assistantMessages.$inferSelect;
+export type NewAssistantMessageRow = typeof assistantMessages.$inferInsert;
+
 // Per-user, per-day generation counter backing the silent safety cap.
 // Composite PK (userId, day) so each user has at most one row per calendar day.
 export const generationUsage = pgTable(
@@ -116,7 +133,18 @@ export type GenerationUsage = typeof generationUsage.$inferSelect;
 
 export const usersRelations = relations(users, ({ many }) => ({
   trips: many(trips),
+  assistantMessages: many(assistantMessages),
 }));
+
+export const assistantMessagesRelations = relations(
+  assistantMessages,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [assistantMessages.userId],
+      references: [users.id],
+    }),
+  }),
+);
 
 export const tripsRelations = relations(trips, ({ one, many }) => ({
   user: one(users, { fields: [trips.userId], references: [users.id] }),

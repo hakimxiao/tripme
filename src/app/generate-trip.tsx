@@ -1,9 +1,10 @@
-import { createTrip, type CreateTripInput } from "@/lib/api";
-import { useAuth } from "@clerk/expo";
-import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { ErrorScreen } from "@/components/ui/ErrorScreen";
+import { createTrip, type CreateTripInput } from "@/lib/api";
+import { useAuth } from "@clerk/expo";
+import * as Sentry from "@sentry/react-native";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -171,16 +172,44 @@ export default function GenerateTrip() {
 
     setSubmitting(true);
     try {
-      const { id } = await createTrip(getToken, input);
-      // Replace so back doesn't return to the form mid-generation.
-      router.replace({
-        pathname: "/trip-loading",
-        params: {
-          id,
-          destination: input.destination,
-          numDays: String(numDays),
+      // Trace the whole "tap Generate → trip created → navigate" action as one
+      // transaction so we can see how long users wait to kick off generation.
+      await Sentry.startSpan(
+        {
+          name: "Generate trip",
+          op: "ui.action",
+          attributes: {
+            destination: input.destination,
+            num_days: numDays,
+            num_travelers: input.numTravelers,
+            budget_tier: input.budgetTier,
+            interest_count: input.interests.length,
+          },
         },
-      });
+        async () => {
+          const { id } = await createTrip(getToken, input);
+          // One wide event capturing the full request context — lets us slice trip
+          // generations by destination, length, budget tier, etc. in production.
+          Sentry.logger.info("Trip generation started", {
+            trip_id: id,
+            destination: input.destination,
+            num_days: numDays,
+            num_travelers: input.numTravelers,
+            budget_tier: input.budgetTier,
+            interest_count: input.interests.length,
+            pace: input.pace ?? "unset",
+          });
+          // Replace so back doesn't return to the form mid-generation.
+          router.replace({
+            pathname: "/trip-loading",
+            params: {
+              id,
+              destination: input.destination,
+              numDays: String(numDays),
+            },
+          });
+        },
+      );
     } catch (error) {
       setSubmitting(false);
       setErrorState(
